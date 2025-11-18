@@ -2,6 +2,7 @@ package com.ntt.prueba.shared;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -12,7 +13,7 @@ import org.springframework.data.repository.NoRepositoryBean;
 import jakarta.transaction.Transactional;
 
 @NoRepositoryBean
-public interface BaseJpaRepository<T extends BaseEntity> extends JpaRepository<T, Long>, JpaSpecificationExecutor<T> {
+public interface BaseJpaRepository<T extends BaseEntity> extends JpaRepository<T, UUID>, JpaSpecificationExecutor<T> {
 
   @Query("SELECT e FROM #{#entityName} e WHERE e.isDeleted = false")
   List<T> findAllActive();
@@ -21,7 +22,7 @@ public interface BaseJpaRepository<T extends BaseEntity> extends JpaRepository<T
   List<T> findAllDeleted();
 
   @Query("SELECT e FROM #{#entityName} e WHERE e.id = :id AND e.isDeleted = false")
-  Optional<T> findByIdActive(Long id);
+  Optional<T> findByIdActive(UUID id);
 
   @Query("SELECT COUNT(e) FROM #{#entityName} e WHERE e.isDeleted = false")
   long countActive();
@@ -30,7 +31,7 @@ public interface BaseJpaRepository<T extends BaseEntity> extends JpaRepository<T
   long countDeleted();
 
   @Transactional
-  default void delete(Long id) {
+  default void delete(UUID id) {
     Optional<T> entity = findById(id);
     if (entity.isPresent()) {
       T e = entity.get();
@@ -40,7 +41,7 @@ public interface BaseJpaRepository<T extends BaseEntity> extends JpaRepository<T
   }
 
   @Transactional
-  default int deleteAllById(List<Long> ids) {
+  default int deleteAllById(List<UUID> ids) {
     List<T> entities = findAllById(ids);
     if (entities.isEmpty())
       return 0;
@@ -61,15 +62,15 @@ public interface BaseJpaRepository<T extends BaseEntity> extends JpaRepository<T
   @Transactional
   @Modifying
   @Query("DELETE #{#entityName} e WHERE e.id IN :ids ")
-  int hardDelete(List<Long> ids);
+  int hardDelete(List<UUID> ids);
 
   @Transactional
   @Modifying
   @Query("DELETE #{#entityName} e WHERE e.id = :id ")
-  int hardDelete(Long id);
+  int hardDelete(UUID id);
 
   @Transactional
-  default boolean restore(Long id) {
+  default boolean restore(UUID id) {
     Optional<T> entity = findById(id);
     if (entity.isPresent() && entity.get().getIsDeleted()) {
       T e = entity.get();

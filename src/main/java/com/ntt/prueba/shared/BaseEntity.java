@@ -1,10 +1,12 @@
 package com.ntt.prueba.shared;
 
+import java.util.UUID;
+
 import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.FilterDef;
+import org.hibernate.annotations.UuidGenerator;
 
 import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
 import lombok.AllArgsConstructor;
@@ -23,10 +25,10 @@ import lombok.experimental.SuperBuilder;
 public abstract class BaseEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue
+    @UuidGenerator
+    private UUID id;
 
     @Builder.Default
     private Boolean isDeleted = false;
-
 }

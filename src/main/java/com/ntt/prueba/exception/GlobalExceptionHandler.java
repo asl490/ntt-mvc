@@ -17,46 +17,22 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import com.ntt.prueba.exception.exception.BaseException;
 import com.ntt.prueba.exception.exception.BusinessRuleException;
-import com.ntt.prueba.exception.exception.DomainException;
-import com.ntt.prueba.exception.exception.InvalidEmailException;
-import com.ntt.prueba.exception.exception.InvalidInputException;
-import com.ntt.prueba.exception.exception.ResourceNotFoundException;
+
+import lombok.extern.slf4j.Slf4j;
 
 @ControllerAdvice
+@Slf4j
 public class GlobalExceptionHandler {
 
-        @ExceptionHandler(InvalidEmailException.class)
-        public ResponseEntity<ErrorResponse> handleInvalidEmailException(InvalidEmailException ex) {
+        @ExceptionHandler(BaseException.class)
+        public ResponseEntity<ErrorResponse> handleBaseException(BaseException ex) {
                 ErrorResponse errorResponse = new ErrorResponse(
-                                HttpStatus.BAD_REQUEST.value(),
-                                "INVALID_EMAIL",
-                                ex.getMessage(),
-                                LocalDateTime.now(),
-                                Collections.singletonList(ex.getMessage()));
-                return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
-        }
 
-        @ExceptionHandler(DomainException.class)
-        public ResponseEntity<ErrorResponse> handleDomainException(DomainException ex) {
-                ErrorResponse errorResponse = new ErrorResponse(
-                                HttpStatus.BAD_REQUEST.value(),
-                                "DOMAIN_ERROR",
                                 ex.getMessage(),
-                                LocalDateTime.now(),
-                                Collections.singletonList(ex.getMessage()));
-                return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
-        }
-
-        @ExceptionHandler(ResourceNotFoundException.class)
-        public ResponseEntity<ErrorResponse> handleResourceNotFoundException(ResourceNotFoundException ex) {
-                ErrorResponse errorResponse = new ErrorResponse(
-                                HttpStatus.NOT_FOUND.value(),
-                                "RESOURCE_NOT_FOUND",
-                                ex.getMessage(),
-                                LocalDateTime.now(),
-                                Collections.singletonList(ex.getMessage()));
-                return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+                                LocalDateTime.now());
+                return new ResponseEntity<>(errorResponse, ex.getHttpStatus());
         }
 
         @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -68,8 +44,6 @@ public class GlobalExceptionHandler {
                                 .collect(Collectors.toList());
 
                 ErrorResponse errorResponse = new ErrorResponse(
-                                HttpStatus.BAD_REQUEST.value(),
-                                "VALIDATION_ERROR",
                                 "Validation failed",
                                 LocalDateTime.now(),
                                 errors);
@@ -108,8 +82,7 @@ public class GlobalExceptionHandler {
                                 .split(":");
 
                 ErrorResponse errorResponse = new ErrorResponse(
-                                HttpStatus.CONFLICT.value(),
-                                errorParts[0],
+
                                 errorParts[1],
                                 LocalDateTime.now(),
                                 Collections.singletonList(rawMessage));
@@ -120,8 +93,7 @@ public class GlobalExceptionHandler {
         @ExceptionHandler(AuthenticationException.class)
         public ResponseEntity<ErrorResponse> handleAuthenticationException(AuthenticationException ex) {
                 ErrorResponse errorResponse = new ErrorResponse(
-                                HttpStatus.UNAUTHORIZED.value(),
-                                "UNAUTHORIZED",
+
                                 ex.getMessage(),
                                 LocalDateTime.now(),
                                 Collections.singletonList(ex.getMessage()));
@@ -131,8 +103,7 @@ public class GlobalExceptionHandler {
         @ExceptionHandler(AccessDeniedException.class)
         public ResponseEntity<ErrorResponse> handleAccessDeniedException(AccessDeniedException ex) {
                 ErrorResponse errorResponse = new ErrorResponse(
-                                HttpStatus.FORBIDDEN.value(),
-                                "FORBIDDEN",
+
                                 ex.getMessage(),
                                 LocalDateTime.now(),
                                 Collections.singletonList(ex.getMessage()));
@@ -142,19 +113,7 @@ public class GlobalExceptionHandler {
         @ExceptionHandler(BusinessRuleException.class)
         public ResponseEntity<ErrorResponse> handleBusinessRuleException(BusinessRuleException ex) {
                 ErrorResponse errorResponse = new ErrorResponse(
-                                HttpStatus.BAD_REQUEST.value(),
-                                "BUSINESS_RULE_VIOLATION",
-                                ex.getMessage(),
-                                LocalDateTime.now(),
-                                Collections.singletonList(ex.getMessage()));
-                return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
-        }
 
-        @ExceptionHandler(InvalidInputException.class)
-        public ResponseEntity<ErrorResponse> handleInvalidInputException(InvalidInputException ex) {
-                ErrorResponse errorResponse = new ErrorResponse(
-                                HttpStatus.BAD_REQUEST.value(),
-                                "INVALID_INPUT",
                                 ex.getMessage(),
                                 LocalDateTime.now(),
                                 Collections.singletonList(ex.getMessage()));
@@ -164,8 +123,7 @@ public class GlobalExceptionHandler {
         @ExceptionHandler(Exception.class)
         public ResponseEntity<ErrorResponse> handleGenericException(Exception ex) {
                 ErrorResponse errorResponse = new ErrorResponse(
-                                HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                                "INTERNAL_SERVER_ERROR",
+
                                 "An unexpected error occurred",
                                 LocalDateTime.now(),
                                 Collections.singletonList(ex.getMessage()));

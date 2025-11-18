@@ -2,14 +2,16 @@ package com.ntt.prueba.shared;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.ntt.prueba.exception.exception.ResourceNotFoundException;
+import com.ntt.prueba.exception.exception.BaseException;
 
 @Transactional
 public abstract class BaseServiceImpl<ENTITY extends BaseEntity, CREATE_DTO, UPDATE_DTO, RESPONSE_DTO, TFilters>
@@ -33,37 +35,41 @@ public abstract class BaseServiceImpl<ENTITY extends BaseEntity, CREATE_DTO, UPD
     }
 
     @Override
-    public RESPONSE_DTO update(Long id, UPDATE_DTO request) {
-        ENTITY entity = repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Entity not found"));
+    public RESPONSE_DTO update(UUID id, UPDATE_DTO request) {
+        ENTITY entity = repository.findById(id)
+                .orElseThrow(() -> new BaseException("Entity not found", HttpStatus.NOT_FOUND));
         mapper.updateEntityFromDTO(request, entity);
         entity = repository.save(entity);
         return mapper.toDTO(entity);
     }
 
     @Override
-    public void delete(Long id) {
-        ENTITY entity = repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Entity not found"));
+    public void delete(UUID id) {
+        ENTITY entity = repository.findById(id)
+                .orElseThrow(() -> new BaseException("Entity not found", HttpStatus.NOT_FOUND));
         entity.setIsDeleted(true);
         repository.save(entity);
     }
 
     @Override
-    public void restore(Long id) {
-        ENTITY entity = repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Entity not found"));
+    public void restore(UUID id) {
+        ENTITY entity = repository.findById(id)
+                .orElseThrow(() -> new BaseException("Entity not found", HttpStatus.NOT_FOUND));
         entity.setIsDeleted(false);
         repository.save(entity);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public RESPONSE_DTO getById(Long id) {
-        ENTITY entity = repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Entity not found"));
+    public RESPONSE_DTO getById(UUID id) {
+        ENTITY entity = repository.findById(id)
+                .orElseThrow(() -> new BaseException("Entity not found", HttpStatus.NOT_FOUND));
         return mapper.toDTO(entity);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<RESPONSE_DTO> getOptionalById(Long id) {
+    public Optional<RESPONSE_DTO> getOptionalById(UUID id) {
         return repository.findById(id).map(mapper::toDTO);
     }
 

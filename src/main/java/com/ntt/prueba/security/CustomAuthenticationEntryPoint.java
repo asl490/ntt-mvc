@@ -40,8 +40,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
                 Throwable cause = actualException.getCause() != null ? actualException.getCause() : actualException;
 
                 ErrorResponse errorResponse = new ErrorResponse(
-                                HttpStatus.UNAUTHORIZED.value(),
-                                cause.getClass().getSimpleName(),
+
                                 cause.getMessage(),
                                 LocalDateTime.now(),
                                 Collections.singletonList(cause.getLocalizedMessage()));

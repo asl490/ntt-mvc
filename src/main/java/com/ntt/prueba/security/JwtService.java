@@ -62,6 +62,8 @@ public class JwtService {
                 .builder()
                 .claims(extraClaims)
                 .claim("sub", user.getUsername())
+                .claim("name", user.getName())
+                .claim("rol", user.getRoles().stream().map(r -> r.getName()).toList())
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(getSignInKey())

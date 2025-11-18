@@ -1,10 +1,12 @@
 package com.ntt.prueba.auth.service.impl;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -23,7 +25,7 @@ import com.ntt.prueba.auth.repository.RoleRepository;
 import com.ntt.prueba.auth.repository.UserRepository;
 import com.ntt.prueba.auth.service.AuthService;
 import com.ntt.prueba.auth.service.UserService;
-import com.ntt.prueba.exception.exception.ResourceNotFoundException;
+import com.ntt.prueba.exception.exception.BaseException;
 import com.ntt.prueba.security.JwtService;
 
 import lombok.RequiredArgsConstructor;
@@ -46,17 +48,23 @@ public class AuthServiceImpl implements AuthService {
                 List<Role> roles = new ArrayList<>();
                 if (request.getRoleNames() == null || request.getRoleNames().isEmpty()) {
                         roles.add(roleRepository.findByName("USER")
-                                        .orElseThrow(() -> new ResourceNotFoundException("Role USER not found")));
+                                        .orElseThrow(() -> new BaseException("Role USER not found")));
                 } else {
                         request.getRoleNames().forEach(roleName -> roles.add(roleRepository.findByName(roleName)
-                                        .orElseThrow(() -> new ResourceNotFoundException(
-                                                        "Role " + roleName + " not found"))));
+                                        .orElseThrow(() -> new BaseException(
+                                                        "Role " + roleName + " not found", HttpStatus.NOT_FOUND))));
+                }
+                User existingUser = userRepository.findByUsername(request.getCorreo()).orElse(null);
+                if (existingUser != null) {
+                        throw new BaseException("El correo ya esta registrado", HttpStatus.CONFLICT);
                 }
 
                 User user = User.builder()
-                                .username(request.getUsername())
+                                .username(request.getCorreo())
+                                .name(request.getNombre())
                                 .password(passwordEncoder.encode(request.getPassword()))
                                 .roles(roles)
+                                .lastlogin(LocalDateTime.now())
                                 .build();
 
                 User createdUser = userRepository.save(user);
@@ -66,6 +74,11 @@ public class AuthServiceImpl implements AuthService {
 
                 return AuthResponse.builder()
                                 .accessToken(jwt)
+                                .activo(!user.getIsDeleted())
+                                .creado(user.getCreatedDate())
+                                .modificado(user.getLastModifiedDate())
+                                .ultimoLogin(user.getLastlogin())
+                                .id(user.getId())
                                 .refreshToken(refreshToken.getToken())
                                 .build();
         }
@@ -76,11 +89,18 @@ public class AuthServiceImpl implements AuthService {
                 authenticationManager.authenticate(
                                 new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
                 User user = userService.getUserByUsername(request.getUsername())
-                                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+                                .orElseThrow(() -> new BaseException("User not found", HttpStatus.NOT_FOUND));
                 String jwt = jwtService.generateToken(user);
                 RefreshToken refreshToken = createRefreshToken(user);
+                user.setLastlogin(LocalDateTime.now());
+                userRepository.save(user);
                 return AuthResponse.builder()
                                 .accessToken(jwt)
+                                .activo(!user.getIsDeleted())
+                                .creado(user.getCreatedDate())
+                                .modificado(user.getLastModifiedDate())
+                                .ultimoLogin(user.getLastlogin())
+                                .id(user.getId())
                                 .refreshToken(refreshToken.getToken())
                                 .build();
         }
@@ -89,11 +109,13 @@ public class AuthServiceImpl implements AuthService {
         @Transactional
         public AuthResponse refreshToken(RefreshTokenRequest request) {
                 RefreshToken refreshToken = refreshTokenRepository.findByToken(request.getRefreshToken())
-                                .orElseThrow(() -> new ResourceNotFoundException("Refresh Token is not in DB!"));
+                                .orElseThrow(() -> new BaseException("Refresh Token is not in DB!",
+                                                HttpStatus.NOT_FOUND));
 
                 if (refreshToken.getExpiryDate().isBefore(Instant.now())) {
                         refreshTokenRepository.delete(refreshToken);
-                        throw new RuntimeException("Refresh token was expired. Please make a new signin request");
+                        throw new BaseException("Refresh token was expired. Please make a new signin request",
+                                        HttpStatus.UNAUTHORIZED);
                 }
 
                 refreshTokenRepository.delete(refreshToken);

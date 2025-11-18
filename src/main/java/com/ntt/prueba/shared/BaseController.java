@@ -1,6 +1,7 @@
 package com.ntt.prueba.shared;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +28,7 @@ public abstract class BaseController<CREATE_DTO, UPDATE_DTO, RESPONSE_DTO, TFilt
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<RESPONSE_DTO> getById(@PathVariable Long id) {
+    public ResponseEntity<RESPONSE_DTO> getById(@PathVariable UUID id) {
         RESPONSE_DTO response = service.getById(id);
         return ResponseEntity.ok(response);
     }
@@ -56,13 +57,13 @@ public abstract class BaseController<CREATE_DTO, UPDATE_DTO, RESPONSE_DTO, TFilt
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<RESPONSE_DTO> update(@PathVariable Long id, @Valid @RequestBody UPDATE_DTO request) {
+    public ResponseEntity<RESPONSE_DTO> update(@PathVariable UUID id, @Valid @RequestBody UPDATE_DTO request) {
         RESPONSE_DTO response = service.update(id, request);
         return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable UUID id) {
         service.delete(id);
         return ResponseEntity.noContent().build();
     }
