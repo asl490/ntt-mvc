@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import com.ntt.prueba.exception.exception.BaseException;
-import com.ntt.prueba.exception.exception.BusinessRuleException;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -108,16 +107,6 @@ public class GlobalExceptionHandler {
                                 LocalDateTime.now(),
                                 Collections.singletonList(ex.getMessage()));
                 return new ResponseEntity<>(errorResponse, HttpStatus.FORBIDDEN);
-        }
-
-        @ExceptionHandler(BusinessRuleException.class)
-        public ResponseEntity<ErrorResponse> handleBusinessRuleException(BusinessRuleException ex) {
-                ErrorResponse errorResponse = new ErrorResponse(
-
-                                ex.getMessage(),
-                                LocalDateTime.now(),
-                                Collections.singletonList(ex.getMessage()));
-                return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
         }
 
         @ExceptionHandler(Exception.class)
