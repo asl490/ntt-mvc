@@ -41,3 +41,10 @@ server:
   error:
     include-message: always
     include-binding-errors: always
+
+# Configuración de validación de contraseñas
+validation:
+  password:
+    # Patrón: al menos 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial
+    pattern: "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@#$%^&+=]).{8,}$"
+    message: "La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial"

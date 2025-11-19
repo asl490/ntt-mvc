@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -17,6 +18,7 @@ import com.ntt.prueba.auth.dto.AuthResponse;
 import com.ntt.prueba.auth.dto.AuthenticationRequest;
 import com.ntt.prueba.auth.dto.RefreshTokenRequest;
 import com.ntt.prueba.auth.dto.RegisterRequest;
+import com.ntt.prueba.auth.entity.Phone;
 import com.ntt.prueba.auth.entity.RefreshToken;
 import com.ntt.prueba.auth.entity.Role;
 import com.ntt.prueba.auth.entity.User;
@@ -59,6 +61,7 @@ public class AuthServiceImpl implements AuthService {
                         throw new BaseException("El correo ya esta registrado", HttpStatus.CONFLICT);
                 }
 
+                // Crear el usuario
                 User user = User.builder()
                                 .username(request.getCorreo())
                                 .name(request.getNombre())
@@ -67,6 +70,23 @@ public class AuthServiceImpl implements AuthService {
                                 .lastlogin(LocalDateTime.now())
                                 .build();
 
+                // Crear los teléfonos y establecer la relación bidireccional ANTES de guardar
+                if (request.getPhones() != null && !request.getPhones().isEmpty()) {
+                        List<Phone> phones = request.getPhones().stream()
+                                        .map(phoneDTO -> Phone.builder()
+                                                        .number(phoneDTO.getNumber())
+                                                        .cityCode(phoneDTO.getCityCode())
+                                                        .countryCode(phoneDTO.getCountryCode())
+                                                        .build())
+                                        .collect(Collectors.toList());
+
+                        // Establecer la relación bidireccional
+                        phones.forEach(phone -> phone.setUser(user));
+                        user.setPhones(phones);
+                }
+
+                // Guardar el usuario - cascade se encarga de guardar los teléfonos
+                // automáticamente
                 User createdUser = userRepository.save(user);
 
                 String jwt = jwtService.generateToken(createdUser);

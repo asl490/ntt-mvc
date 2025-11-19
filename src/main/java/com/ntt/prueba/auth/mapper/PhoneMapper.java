@@ -1,5 +1,7 @@
 package com.ntt.prueba.auth.mapper;
 
+import java.util.UUID;
+
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
@@ -7,10 +9,15 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 
 import com.ntt.prueba.auth.dto.PhoneDTO;
 import com.ntt.prueba.auth.entity.Phone;
+import com.ntt.prueba.auth.entity.User;
 import com.ntt.prueba.shared.BaseMapper;
 
 @Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface PhoneMapper extends BaseMapper<Phone, PhoneDTO, PhoneDTO.CreatePhoneDTO, PhoneDTO.UpdatePhoneDTO> {
+
+    @Override
+    @Mapping(source = "user.id", target = "user")
+    PhoneDTO toDTO(Phone entity);
 
     @Override
     @Mapping(target = "id", ignore = true)
@@ -30,4 +37,7 @@ public interface PhoneMapper extends BaseMapper<Phone, PhoneDTO, PhoneDTO.Create
     @Mapping(target = "isDeleted", ignore = true)
     void updateEntityFromDTO(PhoneDTO.UpdatePhoneDTO dto, @MappingTarget Phone entity);
 
+    default User mapUser(UUID id) {
+        return id == null ? null : User.builder().id(id).build();
+    }
 }

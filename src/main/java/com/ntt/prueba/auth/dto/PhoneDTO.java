@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 public class PhoneDTO {
     private UUID id;
 
-    private Long person;
+    private UUID user;
 
     private String number;
 
@@ -24,8 +24,18 @@ public class PhoneDTO {
 
     @Data
     public static class CreatePhoneDTO {
+        private UUID user;
 
-        private Long person;
+        private String number;
+
+        private String cityCode;
+
+        private String countryCode;
+
+    }
+
+    @Data
+    public static class CreatePhoneUserDTO {
 
         private String number;
 
@@ -38,7 +48,7 @@ public class PhoneDTO {
     @Data
     public static class UpdatePhoneDTO {
 
-        private Long person;
+        private UUID user;
 
         private String number;
 
@@ -50,8 +60,6 @@ public class PhoneDTO {
 
     @Data
     public static class FiltersPhoneDTO {
-
-        private Long person;
 
         private String number;
 

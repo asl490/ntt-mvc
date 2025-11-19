@@ -3,6 +3,8 @@ package com.ntt.prueba.auth.entity;
 import com.ntt.prueba.shared.Auditable;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -17,7 +19,9 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = true)
 public class Phone extends Auditable {
 
-    private Long person;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
     private String number;
 
