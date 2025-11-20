@@ -35,7 +35,7 @@ logging:
     console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
 
 server:
-  port: 6969
+  port: 8080
   servlet:
     context-path: /api/v1
   error:

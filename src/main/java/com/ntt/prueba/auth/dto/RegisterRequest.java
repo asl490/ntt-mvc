@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.ntt.prueba.auth.validation.ValidPassword;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -28,5 +29,6 @@ public class RegisterRequest {
 
     private List<String> roleNames;
 
+    @Valid
     private List<PhoneDTO.CreatePhoneUserDTO> phones;
 }

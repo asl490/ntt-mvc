@@ -23,10 +23,13 @@ public class Phone extends Auditable {
     @JoinColumn(name = "user_id")
     private User user;
 
+    // @Column(length = 14)
     private String number;
 
+    // @Column(length = 4)
     private String cityCode;
 
+    // @Column(length = 4)
     private String countryCode;
 
 }

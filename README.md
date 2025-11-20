@@ -90,6 +90,51 @@ spring:
     password: # Contraseña de BD
 ```
 
+### Esquema de Base de Datos
+
+El proyecto incluye scripts SQL para inicializar la base de datos en el directorio `database/`:
+
+- **`schema.sql`**: Script compatible con PostgreSQL y MySQL
+- **`schema-h2.sql`**: Script optimizado para H2 Database (usado por defecto)
+
+#### Estructura de Tablas
+
+El sistema utiliza las siguientes tablas:
+
+| Tabla | Descripción |
+|-------|-------------|
+| `users` | Información de usuarios y credenciales |
+| `roles` | Roles del sistema (USER, ADMIN, MODERATOR) |
+| `user_roles` | Relación muchos-a-muchos entre usuarios y roles |
+| `phone` | Números telefónicos asociados a usuarios |
+| `refresh_tokens` | Tokens de refresco para autenticación JWT |
+| `authentication_audit` | Auditoría de eventos de autenticación |
+
+Todas las tablas heredan campos de auditoría:
+- `id` (UUID): Identificador único
+- `created_by`: Usuario que creó el registro
+- `created_date`: Fecha de creación
+- `last_modified_by`: Último usuario que modificó
+- `last_modified_date`: Fecha de última modificación
+- `is_deleted`: Flag para borrado lógico
+
+#### Ejecutar Scripts de Base de Datos
+
+**Para H2 (por defecto):**
+```bash
+# El esquema se crea automáticamente con JPA
+# O ejecutar manualmente desde H2 Console
+```
+
+**Para PostgreSQL/MySQL:**
+```bash
+# PostgreSQL
+psql -U username -d database_name -f database/schema.sql
+
+# MySQL
+mysql -u username -p database_name < database/schema.sql
+```
+
 ### Configuración de Validación de Contraseñas
 
 Puedes personalizar los requisitos de contraseña en `application.yml`:
@@ -155,10 +200,11 @@ java -jar target/prueba-0.0.1-SNAPSHOT.jar
 
 Una vez iniciado, el sistema estará disponible en:
 
-- **URL Base**: `http://localhost:6969/api/v1`
-- **Swagger UI**: `http://localhost:6969/api/v1/swagger-ui.html`
-- **OpenAPI Docs**: `http://localhost:6969/api/v1/v3/api-docs`
-- **Health Check**: `http://localhost:6969/api/v1/actuator/health`
+- **URL Base**: `http://localhost:8080/api/v1`
+- **Swagger UI**: `http://localhost:8080/api/v1/swagger-ui.html`
+- **OpenAPI Docs**: `http://localhost:8080/api/v1/v3/api-docs`
+- **Health Check**: `http://localhost:8080/api/v1/actuator/health`
+
 
 ---
 
@@ -247,7 +293,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIs...
 
 Accede a la documentación interactiva en:
 ```
-http://localhost:6969/api/v1/swagger-ui.html
+http://localhost:8080/api/v1/swagger-ui.html
 ```
 
 Desde aquí puedes:
@@ -333,11 +379,11 @@ Los tokens JWT tienen una expiración configurable. Revisa `SecurityConfig.java`
 
 ### Puerto ya en uso
 
-Si el puerto 6969 está ocupado, cámbialo en `application.yml`:
+Si el puerto 8080 está ocupado, cámbialo en `application.yml`:
 
 ```yaml
 server:
-  port: 8080  # Cambiar a otro puerto
+  port: 9090  # Cambiar a otro puerto disponible
 ```
 
 ### Error de compilación con Lombok
@@ -359,7 +405,7 @@ spring:
       path: /h2-console
 ```
 
-Accede en: `http://localhost:6969/api/v1/h2-console`
+Accede en: `http://localhost:8080/api/v1/h2-console`
 
 ---
 
@@ -414,3 +460,7 @@ Para preguntas o soporte, contacta al equipo de desarrollo.
 - ✅ Documentación OpenAPI/Swagger
 - ✅ Relaciones bidireccionales con cascade
 - ✅ Refresh token functionality
+- ✅ Scripts de inicialización de base de datos (PostgreSQL, MySQL, H2)
+- ✅ Auditoría completa de eventos de autenticación
+- ✅ Corrección de tipos genéricos en builders (Lombok @SuperBuilder)
+- ✅ Puerto actualizado a 8080 (estándar HTTP)

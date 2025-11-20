@@ -2,6 +2,7 @@ package com.ntt.prueba.auth.dto;
 
 import java.util.UUID;
 
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -26,10 +27,13 @@ public class PhoneDTO {
     public static class CreatePhoneDTO {
         private UUID user;
 
+        @Pattern(regexp = "\\d{8,12}", message = "El número debe tener entre 8 y 12 dígitos")
         private String number;
 
+        @Pattern(regexp = "\\d{1,4}", message = "El código de ciudad debe tener entre 1 y 4 dígitos")
         private String cityCode;
 
+        @Pattern(regexp = "\\d{1,4}", message = "El código de país debe tener entre 1 y 4 dígitos")
         private String countryCode;
 
     }
@@ -37,10 +41,13 @@ public class PhoneDTO {
     @Data
     public static class CreatePhoneUserDTO {
 
+        @Pattern(regexp = "\\d{8,12}", message = "El número debe tener entre 8 y 12 dígitos")
         private String number;
 
+        @Pattern(regexp = "\\d{1,4}", message = "El código de ciudad debe tener entre 1 y 4 dígitos")
         private String cityCode;
 
+        @Pattern(regexp = "\\d{1,4}", message = "El código de país debe tener entre 1 y 4 dígitos")
         private String countryCode;
 
     }

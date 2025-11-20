@@ -1,0 +1,45 @@
+spring:
+  application:
+    name: politech-backend-test
+
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: 
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+        format_sql: true
+
+  h2:
+    console:
+      enabled: false
+
+  main:
+    allow-circular-references: true
+
+# JWT Configuration for tests
+  security:
+    jwt:
+      secret: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+      expiration: 3600000 # 1 hour
+      refresh-expiration: 86400000 # 24 hours
+
+# Configuración de validación de contraseñas
+validation:
+  password:
+    pattern: "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@#$%^&+=]).{8,}$"
+    message: "La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial"
+
+logging:
+  level:
+    root: INFO
+    com.ntt.prueba: DEBUG
+    org.springframework.web: WARN
+    org.hibernate: WARN
