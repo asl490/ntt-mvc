@@ -120,20 +120,12 @@ Todas las tablas heredan campos de auditoría:
 
 #### Ejecutar Scripts de Base de Datos
 
-**Para H2 (por defecto):**
+**Para H2 :**
 ```bash
 # El esquema se crea automáticamente con JPA
 # O ejecutar manualmente desde H2 Console
 ```
 
-**Para PostgreSQL/MySQL:**
-```bash
-# PostgreSQL
-psql -U username -d database_name -f database/schema.sql
-
-# MySQL
-mysql -u username -p database_name < database/schema.sql
-```
 
 ### Configuración de Validación de Contraseñas
 
@@ -144,6 +136,14 @@ validation:
   password:
     pattern: "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@#$%^&+=]).{8,}$"
     message: "La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial"
+```
+Actualmente esta con el perfil de desarrollo el cual es mas permisivo `application-dev.yml`:
+
+```yaml
+validation:
+  password:
+    pattern: "^.{4,}$"
+    message: "La contraseña debe tener al menos 4 caracteres"
 ```
 
 ### Variables de Entorno (Opcional)
@@ -218,28 +218,29 @@ POST /api/v1/auth/register
 Content-Type: application/json
 
 {
-  "correo": "usuario@example.com",
+  "correo": "juan.perez@example.com",
   "nombre": "Juan Pérez",
-  "password": "Password123!",
-  "roleNames": ["USER"],
+  "password": "SecurePass123!",
   "phones": [
     {
-      "number": "1234567890",
-      "cityCode": "01",
+      "number": "987654321",
+      "cityCode": "1",
       "countryCode": "+57"
     }
   ]
 }
 ```
 
+**Nota:** El campo `roleNames` no es necesario ya que por defecto se asigna el rol `USER`. La contraseña debe cumplir con los requisitos de validación (mínimo 8 caracteres, mayúscula, minúscula, número y carácter especial).
+
 #### Login
 ```http
-POST /api/v1/auth/login
+POST /api/v1/auth/authenticate
 Content-Type: application/json
 
 {
-  "username": "usuario@example.com",
-  "password": "Password123!"
+  "username": "juan.perez@example.com",
+  "password": "SecurePass123!"
 }
 ```
 
@@ -258,7 +259,7 @@ Content-Type: application/json
 
 #### Refresh Token
 ```http
-POST /api/v1/auth/refresh
+POST /api/v1/auth/refresh-token
 Content-Type: application/json
 
 {
@@ -283,6 +284,85 @@ Para acceder a endpoints protegidos, incluye el token JWT en el header:
 ```http
 GET /api/v1/users
 Authorization: Bearer eyJhbGciOiJIUzI1NiIs...
+```
+
+
+---
+
+## 🚀 Ejemplo de Uso Rápido
+
+A continuación se muestra un flujo completo de autenticación usando el usuario de ejemplo:
+
+### 1. Registrar un Nuevo Usuario
+
+```bash
+curl -X POST http://localhost:8080/api/v1/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "correo": "juan.perez@example.com",
+    "nombre": "Juan Pérez",
+    "password": "SecurePass123!",
+    "phones": [
+      {
+        "number": "987654321",
+        "cityCode": "1",
+        "countryCode": "+57"
+      }
+    ]
+  }'
+```
+
+**Respuesta:**
+```json
+{
+  "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "refreshToken": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "activo": true,
+  "creado": "2025-11-20T15:30:00",
+  "modificado": "2025-11-20T15:30:00",
+  "ultimoLogin": "2025-11-20T15:30:00",
+  "id": "123e4567-e89b-12d3-a456-426614174000"
+}
+```
+
+### 2. Iniciar Sesión
+
+```bash
+curl -X POST http://localhost:8080/api/v1/auth/authenticate \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "juan.perez@example.com",
+    "password": "SecurePass123!"
+  }'
+```
+
+### 3. Usar un Endpoint Protegido
+
+```bash
+# Reemplaza YOUR_ACCESS_TOKEN con el token recibido
+curl -X GET http://localhost:8080/api/v1/users \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+```
+
+### 4. Refrescar el Token
+
+```bash
+# Reemplaza YOUR_REFRESH_TOKEN con el refresh token recibido
+curl -X POST http://localhost:8080/api/v1/auth/refresh-token \
+  -H "Content-Type: application/json" \
+  -d '{
+    "refreshToken": "YOUR_REFRESH_TOKEN"
+  }'
+```
+
+### 5. Cerrar Sesión
+
+```bash
+curl -X POST http://localhost:8080/api/v1/auth/logout \
+  -H "Content-Type: application/json" \
+  -d '{
+    "refreshToken": "YOUR_REFRESH_TOKEN"
+  }'
 ```
 
 ---
@@ -345,7 +425,7 @@ prueba/
 
 ## 🔐 Seguridad
 
-### Requisitos de Contraseña
+### Requisitos de Contraseña(En el perfil de Produccion)
 
 Por defecto, las contraseñas deben cumplir:
 - ✅ Mínimo 8 caracteres
@@ -354,12 +434,50 @@ Por defecto, las contraseñas deben cumplir:
 - ✅ Al menos un número
 - ✅ Al menos un carácter especial (@#$%^&+=)
 
+### Requisitos de Contraseña(En el perfil de Desarrollo)
+
+Por defecto, las contraseñas deben cumplir:
+- ✅ Mínimo 4 caracteres
+
 ### JWT Configuration
 
 Los tokens JWT tienen una expiración configurable. Revisa `SecurityConfig.java` para ajustar:
 - Tiempo de expiración del access token
 - Tiempo de expiración del refresh token
 - Clave secreta (cambiar en producción)
+
+### Sistema de Auditoría de Autenticación
+
+El sistema incluye un módulo completo de auditoría que registra todos los eventos de autenticación:
+
+#### Eventos Registrados
+
+| Evento | Descripción |
+|--------|-------------|
+| `LOGIN` | Inicio de sesión exitoso (registro o autenticación) |
+| `LOGOUT` | Cierre de sesión |
+| `TOKEN_REFRESH` | Renovación de token de acceso |
+| `TOKEN_EXPIRED` | Intento de uso de token expirado |
+| `FAILED_LOGIN` | Intento fallido de inicio de sesión |
+
+#### Información Capturada
+
+Para cada evento de auditoría se registra:
+- ✅ Usuario asociado
+- ✅ Tipo de evento
+- ✅ Hash SHA-256 del access token (para seguridad)
+- ✅ ID del refresh token
+- ✅ Dirección IP del cliente
+- ✅ User-Agent del navegador/cliente
+- ✅ Timestamp del evento
+- ✅ Estado (exitoso/fallido)
+
+#### Características de Seguridad
+
+- Los access tokens se almacenan como hash SHA-256, nunca en texto plano
+- Los registros de auditoría son permanentes (no se eliminan con el logout)
+- Captura de IP real considerando proxies (header `X-Forwarded-For`)
+- Registro de errores sin afectar el flujo de autenticación
 
 ---
 
@@ -414,41 +532,4 @@ logging:
     com.ntt.prueba: DEBUG
 ```
 
----
 
-## 🤝 Contribuir
-
-1. Fork el proyecto
-2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
-3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
-4. Push a la rama (`git push origin feature/AmazingFeature`)
-5. Abre un Pull Request
-
----
-
-## 📄 Licencia
-
-Este proyecto es privado y confidencial.
-
----
-
-## 👥 Contacto
-
-Para preguntas o soporte, contacta al equipo de desarrollo.
-
----
-
-## 🔄 Actualizaciones Recientes
-
-### v0.0.1-SNAPSHOT
-- ✅ Sistema de autenticación JWT
-- ✅ Gestión de usuarios y roles
-- ✅ Soporte para múltiples teléfonos por usuario
-- ✅ Validación dinámica de contraseñas
-- ✅ Documentación OpenAPI/Swagger
-- ✅ Relaciones bidireccionales con cascade
-- ✅ Refresh token functionality
-- ✅ Scripts de inicialización de base de datos (PostgreSQL, MySQL, H2)
-- ✅ Auditoría completa de eventos de autenticación
-- ✅ Corrección de tipos genéricos en builders (Lombok @SuperBuilder)
-- ✅ Puerto actualizado a 8080 (estándar HTTP)

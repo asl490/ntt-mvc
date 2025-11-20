@@ -37,6 +37,6 @@ logs/
 codegen/
 
 ### dev files ###
-*-dev.yaml
-*-dev.properties
-*-dev.yml
+# *-dev.yaml
+# *-dev.properties
+# *-dev.yml
