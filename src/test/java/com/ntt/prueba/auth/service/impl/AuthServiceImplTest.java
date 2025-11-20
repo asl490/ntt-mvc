@@ -10,7 +10,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -90,7 +89,7 @@ class AuthServiceImplTest {
     void testRegister_Success_DefaultRole() {
         // Arrange
         RegisterRequest request = TestDataBuilder.defaultRegisterRequest()
-                .roleNames(null)
+
                 .build();
 
         when(roleRepository.findByName("USER")).thenReturn(Optional.of(userRole));
@@ -119,12 +118,11 @@ class AuthServiceImplTest {
     @DisplayName("Should register new user with specified roles")
     void testRegister_Success_WithRoles() {
         // Arrange
-        Role adminRole = TestDataBuilder.adminRole().build();
+
         RegisterRequest request = TestDataBuilder.defaultRegisterRequest()
-                .roleNames(List.of("ADMIN"))
+
                 .build();
 
-        when(roleRepository.findByName("ADMIN")).thenReturn(Optional.of(adminRole));
         when(userRepository.findByUsername(request.getCorreo())).thenReturn(Optional.empty());
         when(passwordEncoder.encode(anyString())).thenReturn("$2a$10$encodedPassword");
         when(userRepository.save(any(User.class))).thenReturn(testUser);
@@ -137,7 +135,7 @@ class AuthServiceImplTest {
 
         // Assert
         assertNotNull(response);
-        verify(roleRepository, times(1)).findByName("ADMIN");
+        verify(roleRepository, times(1)).findByName("USER");
         verify(userRepository, times(1)).save(any(User.class));
     }
 
@@ -155,24 +153,6 @@ class AuthServiceImplTest {
         });
 
         assertTrue(exception.getMessage().contains("correo ya esta registrado"));
-        verify(userRepository, times(0)).save(any(User.class));
-    }
-
-    @Test
-    @DisplayName("Should throw exception when role not found")
-    void testRegister_RoleNotFound() {
-        // Arrange
-        RegisterRequest request = TestDataBuilder.defaultRegisterRequest()
-                .roleNames(List.of("NONEXISTENT_ROLE"))
-                .build();
-
-        when(roleRepository.findByName("NONEXISTENT_ROLE")).thenReturn(Optional.empty());
-
-        // Act & Assert
-        assertThrows(BaseException.class, () -> {
-            authService.register(request);
-        });
-
         verify(userRepository, times(0)).save(any(User.class));
     }
 

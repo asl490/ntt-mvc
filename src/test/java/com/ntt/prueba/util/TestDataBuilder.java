@@ -99,7 +99,6 @@ public class TestDataBuilder {
                 .correo("newuser@example.com")
                 .nombre("New User")
                 .password("Password123@")
-                .roleNames(List.of("USER"))
                 .phones(phones);
     }
 

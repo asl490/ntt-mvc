@@ -5,7 +5,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
@@ -58,15 +57,17 @@ public class AuthServiceImpl implements AuthService {
         @Override
         @Transactional
         public AuthResponse register(RegisterRequest request) {
-                List<Role> roles = new ArrayList<>();
-                if (request.getRoleNames() == null || request.getRoleNames().isEmpty()) {
-                        roles.add(roleRepository.findByName("USER")
-                                        .orElseThrow(() -> new BaseException("Role USER not found")));
-                } else {
-                        request.getRoleNames().forEach(roleName -> roles.add(roleRepository.findByName(roleName)
-                                        .orElseThrow(() -> new BaseException(
-                                                        "Role " + roleName + " not found", HttpStatus.NOT_FOUND))));
-                }
+                List<Role> roles = roleRepository.findByName("USER").stream().toList();
+                // habilitar para mandar roles desde el request
+                // if (request.getRoleNames() == null || request.getRoleNames().isEmpty()) {
+                // roles.add(roleRepository.findByName("USER")
+                // .orElseThrow(() -> new BaseException("Role USER not found")));
+                // } else {
+                // request.getRoleNames().forEach(roleName ->
+                // roles.add(roleRepository.findByName(roleName)
+                // .orElseThrow(() -> new BaseException(
+                // "Role " + roleName + " not found", HttpStatus.NOT_FOUND))));
+                // }
                 User existingUser = userRepository.findByUsername(request.getCorreo()).orElse(null);
                 if (existingUser != null) {
                         throw new BaseException("El correo ya esta registrado", HttpStatus.CONFLICT);

@@ -312,18 +312,6 @@ Desde aquí puedes:
 mvn test
 ```
 
-### Ejecutar Tests con Cobertura
-
-```bash
-mvn clean test jacoco:report
-```
-
-### Ver Reporte de Cobertura
-
-El reporte se genera en: `target/site/jacoco/index.html`
-
----
-
 ## 📁 Estructura del Proyecto
 
 ```

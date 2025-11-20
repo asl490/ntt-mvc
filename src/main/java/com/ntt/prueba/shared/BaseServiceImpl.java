@@ -35,8 +35,8 @@ public abstract class BaseServiceImpl<ENTITY extends BaseEntity, CREATE_DTO, UPD
     }
 
     @Override
-    public RESPONSE_DTO update(UUID id, UPDATE_DTO request) {
-        ENTITY entity = repository.findById(id)
+    public RESPONSE_DTO update(String id, UPDATE_DTO request) {
+        ENTITY entity = repository.findById(UUID.fromString(id))
                 .orElseThrow(() -> new BaseException("Entity not found", HttpStatus.NOT_FOUND));
         mapper.updateEntityFromDTO(request, entity);
         entity = repository.save(entity);
@@ -44,16 +44,16 @@ public abstract class BaseServiceImpl<ENTITY extends BaseEntity, CREATE_DTO, UPD
     }
 
     @Override
-    public void delete(UUID id) {
-        ENTITY entity = repository.findById(id)
+    public void delete(String id) {
+        ENTITY entity = repository.findById(UUID.fromString(id))
                 .orElseThrow(() -> new BaseException("Entity not found", HttpStatus.NOT_FOUND));
         entity.setIsDeleted(true);
         repository.save(entity);
     }
 
     @Override
-    public void restore(UUID id) {
-        ENTITY entity = repository.findById(id)
+    public void restore(String id) {
+        ENTITY entity = repository.findById(UUID.fromString(id))
                 .orElseThrow(() -> new BaseException("Entity not found", HttpStatus.NOT_FOUND));
         entity.setIsDeleted(false);
         repository.save(entity);
@@ -61,16 +61,16 @@ public abstract class BaseServiceImpl<ENTITY extends BaseEntity, CREATE_DTO, UPD
 
     @Override
     @Transactional(readOnly = true)
-    public RESPONSE_DTO getById(UUID id) {
-        ENTITY entity = repository.findById(id)
+    public RESPONSE_DTO getById(String id) {
+        ENTITY entity = repository.findById(UUID.fromString(id))
                 .orElseThrow(() -> new BaseException("Entity not found", HttpStatus.NOT_FOUND));
         return mapper.toDTO(entity);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<RESPONSE_DTO> getOptionalById(UUID id) {
-        return repository.findById(id).map(mapper::toDTO);
+    public Optional<RESPONSE_DTO> getOptionalById(String id) {
+        return repository.findById(UUID.fromString(id)).map(mapper::toDTO);
     }
 
     @Override

@@ -94,8 +94,7 @@ public class GlobalExceptionHandler {
                 ErrorResponse errorResponse = new ErrorResponse(
 
                                 ex.getMessage(),
-                                LocalDateTime.now(),
-                                Collections.singletonList(ex.getMessage()));
+                                LocalDateTime.now());
                 return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
         }
 
@@ -104,8 +103,7 @@ public class GlobalExceptionHandler {
                 ErrorResponse errorResponse = new ErrorResponse(
 
                                 ex.getMessage(),
-                                LocalDateTime.now(),
-                                Collections.singletonList(ex.getMessage()));
+                                LocalDateTime.now());
                 return new ResponseEntity<>(errorResponse, HttpStatus.FORBIDDEN);
         }
 

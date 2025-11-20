@@ -27,7 +27,7 @@ public class RegisterRequest {
     @ValidPassword
     private String password;
 
-    private List<String> roleNames;
+    // private List<String> roleNames;
 
     @Valid
     private List<PhoneDTO.CreatePhoneUserDTO> phones;
