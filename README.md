@@ -1,4 +1,4 @@
-# Politech Backend - Sistema de Autenticación
+# NTT Prueba Backend - Sistema de Autenticación
 
 Sistema backend desarrollado con Spring Boot que implementa autenticación JWT, gestión de usuarios, roles y teléfonos.
 

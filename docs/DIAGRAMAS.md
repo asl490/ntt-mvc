@@ -331,57 +331,7 @@ classDiagram
 
 ---
 
-## 5. Diagrama de Despliegue
-
-```mermaid
-graph TB
-    subgraph "Production Environment"
-        subgraph "Load Balancer"
-            LB[Nginx/AWS ALB]
-        end
-        
-        subgraph "Application Servers"
-            App1[Spring Boot Instance 1<br/>Port 8080]
-            App2[Spring Boot Instance 2<br/>Port 8080]
-            App3[Spring Boot Instance N<br/>Port 8080]
-        end
-        
-        subgraph "Database Cluster"
-            Master[(PostgreSQL Master)]
-            Replica1[(PostgreSQL Replica 1)]
-            Replica2[(PostgreSQL Replica 2)]
-        end
-        
-        subgraph "Monitoring"
-            Logs[Log Aggregation<br/>ELK Stack]
-            Metrics[Metrics<br/>Prometheus/Grafana]
-        end
-    end
-    
-    Internet[Internet] --> LB
-    LB --> App1
-    LB --> App2
-    LB --> App3
-    
-    App1 --> Master
-    App2 --> Master
-    App3 --> Master
-    
-    Master -.->|Replication| Replica1
-    Master -.->|Replication| Replica2
-    
-    App1 -.->|Logs| Logs
-    App2 -.->|Logs| Logs
-    App3 -.->|Logs| Logs
-    
-    App1 -.->|Metrics| Metrics
-    App2 -.->|Metrics| Metrics
-    App3 -.->|Metrics| Metrics
-```
-
----
-
-## 6. Diagrama de Casos de Uso
+## 5. Diagrama de Casos de Uso
 
 ```mermaid
 graph LR
@@ -420,35 +370,7 @@ graph LR
 
 ---
 
-## 7. Diagrama de Estados (Sesión de Usuario)
-
-```mermaid
-stateDiagram-v2
-    [*] --> NoAutenticado
-    
-    NoAutenticado --> Registrando: POST /register
-    Registrando --> Autenticado: Registro exitoso
-    Registrando --> NoAutenticado: Error de validación
-    
-    NoAutenticado --> Autenticando: POST /authenticate
-    Autenticando --> Autenticado: Login exitoso
-    Autenticando --> NoAutenticado: Credenciales inválidas
-    
-    Autenticado --> Activo: Token válido
-    Activo --> RefrescandoToken: Token expirando
-    RefrescandoToken --> Activo: Refresh exitoso
-    RefrescandoToken --> NoAutenticado: Refresh token inválido
-    
-    Activo --> NoAutenticado: POST /logout
-    Activo --> NoAutenticado: Token expirado
-    
-    Activo --> [*]: Sesión cerrada
-    NoAutenticado --> [*]: Usuario sale
-```
-
----
-
-## 8. Diagrama de Paquetes
+## 6. Diagrama de Paquetes
 
 ```mermaid
 graph TB
