@@ -386,11 +386,54 @@ Desde aquí puedes:
 
 ## 🧪 Testing
 
+El proyecto implementa una estrategia de testing completa con **tests unitarios** y **tests de integración**.
+
 ### Ejecutar Todos los Tests
 
 ```bash
 mvn test
 ```
+
+### Ejecutar Solo Tests Unitarios
+
+```bash
+mvn test -Dtest="*Test"
+```
+
+### Ejecutar Solo Tests de Integración
+
+```bash
+mvn test -Dtest="*IntegrationTest"
+```
+
+### Cobertura de Tests
+
+El proyecto incluye:
+
+- ✅ **Tests Unitarios**: Prueban la lógica de negocio de forma aislada usando Mockito
+  - `AuthServiceImplTest`: 12 tests cubriendo registro, login, refresh token, logout
+  - `UserServiceImplTest`: Tests de gestión de usuarios
+  - `PhoneServiceImplTest`: Tests de gestión de teléfonos
+  - `PasswordValidatorTest`: Tests de validación de contraseñas
+
+- ✅ **Tests de Integración**: Prueban el flujo completo end-to-end
+  - `AuthControllerIntegrationTest`: 12 tests cubriendo todos los endpoints de autenticación
+  - Usa MockMvc para simular peticiones HTTP reales
+  - Verifica validaciones, seguridad y respuestas JSON
+
+### Principios de Testing
+
+Para entender los **principios, patrones y mejores prácticas** aplicados en los tests, consulta:
+
+📖 **[Documentación de Principios de Testing](docs/TESTING_PRINCIPLES.md)**
+
+Este documento explica:
+- Estrategia de testing (Unit vs Integration)
+- Principios aplicados (AAA, Test Isolation, BDD, etc.)
+- Patrones utilizados (Builder, Factory, Test Fixture)
+- Justificación de decisiones técnicas
+- Mejores prácticas y anti-patrones
+
 
 ## 📁 Estructura del Proyecto
 
